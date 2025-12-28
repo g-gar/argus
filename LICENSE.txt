@@ -1,13 +1,13 @@
-## Cirrus Restricted Use License
+## Argus Restricted Use License
 
-Copyright © 2025 Cirrus.
+Copyright © 2025 Argus.
 
 All Rights Reserved.
 
 This software and its associated documentation (hereinafter, the
-"Software") are the exclusive intellectual property of Cirrus.
+"Software") are the exclusive intellectual property of Argus.
 
-Strictly prohibited, without the express written consent of Cirrus,
+Strictly prohibited, without the express written consent of Argus,
 are:
 
 1.  The use, copying, modification, redistribution, or reverse
@@ -18,14 +18,14 @@ are:
     functionality to third parties. This includes, but is not
     limited to, the creation of Software as a Service (SaaS),
     hosting platforms, APIs, or any other service directly or
-    indirectly derived from Cirrus's Software.
+    indirectly derived from Argus Software.
 
 3.  The creation of derivative works, adaptations, or extensions of
     the Software.
 
 Any breach of these conditions will result in the immediate
 termination of any granted use permission and may lead to legal
-action by Cirrus.
+action by Argus.
 
 The Software is provided "AS IS", without warranty of any kind,
 express or implied, including but not limited to the warranties of
