@@ -31,6 +31,16 @@ public class FieldInfo {
     boolean isFinal;
 
     /**
+     * Indicates if the field is public.
+     */
+    boolean isPublic;
+
+    /**
+     * Indicates if the field is protected.
+     */
+    boolean isProtected;
+
+    /**
      * Indicates if the field is static.
      */
     boolean isStatic;

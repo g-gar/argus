@@ -57,6 +57,11 @@ public class MethodInfo {
     boolean isPublic;
 
     /**
+     * Indicates if the method is protected.
+     */
+    boolean isProtected;
+
+    /**
      * Indicates if the method is deprecated.
      */
     boolean isDeprecated;

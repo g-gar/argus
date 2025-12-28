@@ -56,27 +56,65 @@ public class BenchmarkRunner {
         log.info("Time: {} ms", (endArgus - startArgus));
         log.info("Breaking Changes: {}", argusDiff.getBreakingCount());
 
-        // 3. Run japicmp
+        // 3. Run japicmp (Public API)
         long startJapi = System.currentTimeMillis();
         JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
+        options.getIgnoreMissingClasses().setIgnoreAllMissingClasses(true);
+        options.setAccessModifier(japicmp.model.AccessModifier.PUBLIC);
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(
                 new JApiCmpArchive(p1.toFile(), v1.version()),
                 new JApiCmpArchive(p2.toFile(), v2.version()));
         long endJapi = System.currentTimeMillis();
-
-        long japiBreaking = jApiClasses.stream()
-                .filter(c -> !c.isBinaryCompatible())
+        long breakingJapi = jApiClasses.stream().filter(c -> !c.isBinaryCompatible()).count();
+        long japiRemoved = jApiClasses.stream()
+                .filter(c -> c.getChangeStatus() == japicmp.model.JApiChangeStatus.REMOVED).count();
+        long japiModified = jApiClasses.stream()
+                .filter(c -> c.getChangeStatus() == japicmp.model.JApiChangeStatus.MODIFIED && !c.isBinaryCompatible())
                 .count();
 
         // Markdown Report for GitHub Job Summary
-        System.out.println("### 📊 Argus vs japicmp Benchmark");
+        long addedClasses = argusDiff.classDifferences().stream()
+                .filter(c -> c.changeType() == com.argus.model.diff.ChangeType.ADDED).count();
+        long removedClasses = argusDiff.classDifferences().stream()
+                .filter(c -> c.changeType() == com.argus.model.diff.ChangeType.REMOVED).count();
+        long modifiedClasses = argusDiff.classDifferences().stream()
+                .filter(c -> c.changeType() == com.argus.model.diff.ChangeType.MODIFIED).count();
+
+        long breakingArgus = argusDiff.getBreakingCount(false); // Public Only
+
+        // Post-processing: Compatibility Metric (Group by Top-Level Class)
+        // Group Inner Classes (Outer$Inner) into their Top-Level Class (Outer)
+        // Exclude anonymous classes (containing $Digits) as they are typically not
+        // public API
+        long breakingArgusCompat = argusDiff.classDifferences().stream()
+                .filter(c -> {
+                    String name = c.oldClass().isPresent() ? c.oldClass().get().name() : c.newClass().get().name();
+                    return !name.matches(".*\\$\\d.*");
+                })
+                .collect(java.util.stream.Collectors.groupingBy(c -> {
+                    String name = c.oldClass().isPresent() ? c.oldClass().get().name() : c.newClass().get().name();
+                    int idx = name.indexOf('$');
+                    return idx > -1 ? name.substring(0, idx) : name;
+                }))
+                .values().stream()
+                .filter(group -> group.stream().anyMatch(c -> c.getBreakingCount(false) > 0))
+                .count();
+
+        System.out.println("### 📊 Argus vs japicmp Benchmark (Public API)");
         System.out.println("");
         System.out.println("| Metric | Argus 👁️ | japicmp 📏 |");
         System.out.println("| :--- | :---: | :---: |");
         System.out.printf("| **Execution Time** | %d ms | %d ms |%n", (endArgus - startArgus), (endJapi - startJapi));
-        System.out.printf("| **Breaking Changes** | %d | %d |%n", argusDiff.getBreakingCount(), japiBreaking);
+        System.out.printf("| **Breaking Changes (Granular)** | %d | - |%n", breakingArgus);
+        System.out.printf("| **Breaking Changes (Compat)** | %d | %d |%n", breakingArgusCompat, breakingJapi);
+        System.out.println("");
+        System.out.println("#### Argus Details");
+        System.out.printf("- 🆕 **Classes Added**: %d%n", addedClasses);
+        System.out.printf("- 🗑️ **Classes Removed**: %d%n", removedClasses);
+        System.out.printf("- ✏️ **Classes Modified**: %d%n", modifiedClasses);
+        System.out.println("");
         System.out.println("");
         System.out.println("> *Benchmark run on: " + v1 + " vs " + v2 + "*");
     }

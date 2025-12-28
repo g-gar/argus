@@ -23,8 +23,18 @@ public record LibraryDiff(
      * @return The sum of breaking changes from all class differences.
      */
     public long getBreakingCount() {
+        return getBreakingCount(true);
+    }
+
+    public long getBreakingCount(boolean includeProtected) {
         return classDifferences.stream()
-                .mapToLong(ClassDiff::getBreakingCount)
+                .mapToLong(c -> c.getBreakingCount(includeProtected))
+                .sum();
+    }
+
+    public long getCompactBreakingCount() {
+        return classDifferences.stream()
+                .mapToLong(ClassDiff::getCompactBreakingCount)
                 .sum();
     }
 }

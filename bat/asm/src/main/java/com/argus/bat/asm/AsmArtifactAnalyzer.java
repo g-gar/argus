@@ -207,6 +207,8 @@ public class AsmArtifactAnalyzer implements ArtifactAnalyzer {
                     .type(Type.getType(descriptor).getClassName())
                     .isStatic(isStatic)
                     .isFinal(isFinal)
+                    .isPublic((access & Opcodes.ACC_PUBLIC) != 0)
+                    .isProtected((access & Opcodes.ACC_PROTECTED) != 0)
                     .build());
             return null;
         }
@@ -285,6 +287,7 @@ public class AsmArtifactAnalyzer implements ArtifactAnalyzer {
                     .paramTypes(paramTypes)
                     .isStatic((access & Opcodes.ACC_STATIC) != 0)
                     .isPublic((access & Opcodes.ACC_PUBLIC) != 0)
+                    .isProtected((access & Opcodes.ACC_PROTECTED) != 0)
                     .isDeprecated((access & Opcodes.ACC_DEPRECATED) != 0)
                     .annotations(annotations)
                     .build();

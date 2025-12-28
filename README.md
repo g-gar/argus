@@ -20,6 +20,22 @@ We chose **ASM (OW2)** as our core driver for bytecode manipulation. While high-
 - **Low-Level Access**: It allows us to see technical details (like synthetic flags or specific attributes) that standard Reflection might hide.
 - **Speed**: It is the industry standard for performance-critical bytecode tasks (used by Gradle, Spring, JDK itself).
 
+## 💡 Why Argus? (The "Developer Impact" Metric)
+
+Existing tools like `japicmp` or `revapi` excel at measuring **Binary Compatibility** (will the JVM crash?). Argus measures **Developer Impact** (how much code do I need to rewrite?).
+
+| Feature | Binary Compat Tools (e.g., japicmp) | Argus 👁️ |
+| :--- | :--- | :--- |
+| **Primary Goal** | Prevent runtime errors (LinkageError). | Quantify migration effort. |
+| **Granularity** | **Class-Level**: "1 class removed". | **Member-Level**: "50 broken methods" (The real cost). |
+| **Scope** | Often ignores internal/synthetic classes. | **Strict**: If it's in the bytecode, it counts. |
+| **Philosophy** | "Is it safe to run?" | "Is it painful to upgrade?" |
+
+**Example**: Removing a class with 20 methods.
+- **Standard Tool**: Reports **1** breaking change.
+- **Argus**: Reports **21** breaking changes (1 class + 20 methods).
+*The Argus metric reflects the actual number of compilation errors a developer will face.*
+
 ## 🧩 Architecture & Design
 
 Argus is built with **Clean Code** and **Hexagonal Architecture (Ports & Adapters)** principles at its heart to ensure long-term maintainability and extensibility.
@@ -59,6 +75,14 @@ This architecture makes Argus highly extensible. Future adapters could easily in
 ### Running integration tests
 ```bash
 ./gradlew :utilities:artifact_fetcher:test
+```
+
+### Running Benchmarks
+Compare any two artifacts from Maven Central:
+```bash
+./gradlew :utilities:benchmark:runBenchmark \
+  -Dargus.bench.v1="com.google.guava:guava:31.0-jre" \
+  -Dargus.bench.v2="com.google.guava:guava:31.1-jre"
 ```
 
 ## License
