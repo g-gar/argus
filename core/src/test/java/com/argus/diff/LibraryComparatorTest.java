@@ -43,8 +43,8 @@ class LibraryComparatorTest {
 
         assertEquals(1, diff.classDifferences().size());
         assertEquals(ChangeType.REMOVED, diff.classDifferences().get(0).changeType());
-        // Removing a class is a breaking change? Count logic:
-        assertEquals(0, diff.classDifferences().get(0).getBreakingCount());
+        // Removing a class is a breaking change (1 class + 0 methods + 0 fields = 1)
+        assertEquals(1, diff.classDifferences().get(0).getBreakingCount());
         // Note: Class-level breaking count currently only sums breaking methods.
         // If a class is removed, it might not count as breaking methods unless we
         // define it so.
