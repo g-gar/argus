@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':bat:asm')
+    implementation project(':utilities:artifact_fetcher')
+    implementation 'com.github.siom79.japicmp:japicmp:0.18.3'
+    
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.9'
+    
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+task runBenchmark(type: JavaExec) {
+    group = "verification"
+    description = "Runs the benchmark against japicmp"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.argus.utilities.benchmark.BenchmarkRunner'
+}

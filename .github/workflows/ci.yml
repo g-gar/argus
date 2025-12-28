@@ -2,9 +2,9 @@ name: Argus CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -23,6 +23,15 @@ jobs:
         
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+      with:
+         # Enable caching of the ~/.m2/repository so artifacts persist
+         cache-read-only: false
       
     - name: Build with Gradle Wrapper
       run: ./gradlew build --no-daemon
+
+    - name: Run Benchmark
+      continue-on-error: true
+      run: |
+        ./gradlew :utilities:benchmark:runBenchmark --quiet > benchmark_report.md
+        cat benchmark_report.md >> $GITHUB_STEP_SUMMARY
