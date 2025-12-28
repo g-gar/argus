@@ -1,0 +1,6 @@
+rootProject.name = 'argus'
+
+include 'core'
+include 'bat:asm'
+include 'utilities:artifact_fetcher'
+project(':bat:asm').projectDir = file('bat/asm')
