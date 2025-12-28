@@ -70,15 +70,32 @@ public class BenchmarkRunner {
                 .filter(c -> !c.isBinaryCompatible())
                 .count();
 
-        log.info("--- japicmp Report ---");
-        log.info("Time: {} ms", (endJapi - startJapi));
-        log.info("Classes with Incompatible Changes: {}", japiBreaking);
+        // Markdown Report for GitHub Job Summary
+        System.out.println("### 📊 Argus vs japicmp Benchmark");
+        System.out.println("");
+        System.out.println("| Metric | Argus 👁️ | japicmp 📏 |");
+        System.out.println("| :--- | :---: | :---: |");
+        System.out.printf("| **Execution Time** | %d ms | %d ms |%n", (endArgus - startArgus), (endJapi - startJapi));
+        System.out.printf("| **Breaking Changes** | %d | %d |%n", argusDiff.getBreakingCount(), japiBreaking);
+        System.out.println("");
+        System.out.println("> *Benchmark run on: " + v1 + " vs " + v2 + "*");
     }
 
     public static void main(String[] args) throws Exception {
-        // Example: Compare slf4j-api 1.7.35 vs 1.7.36
+        // Read properties from -Dargus.bench.v1="g:a:v"
+        String v1Str = System.getProperty("argus.bench.v1", "org.slf4j:slf4j-api:1.7.35");
+        String v2Str = System.getProperty("argus.bench.v2", "org.slf4j:slf4j-api:1.7.36");
+
         new BenchmarkRunner().run(
-                new MavenCoordinate("org.slf4j", "slf4j-api", "1.7.35"),
-                new MavenCoordinate("org.slf4j", "slf4j-api", "1.7.36"));
+                parseCoordinate(v1Str),
+                parseCoordinate(v2Str));
+    }
+
+    private static MavenCoordinate parseCoordinate(String s) {
+        String[] parts = s.split(":");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid coordinate format (group:artifact:version): " + s);
+        }
+        return new MavenCoordinate(parts[0], parts[1], parts[2]);
     }
 }

@@ -21,4 +21,7 @@ task runBenchmark(type: JavaExec) {
     description = "Runs the benchmark against japicmp"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.argus.utilities.benchmark.BenchmarkRunner'
+    
+    // Forward all properties starting with "argus."
+    systemProperties System.getProperties().findAll { it.key.toString().startsWith("argus.") }
 }

@@ -32,6 +32,9 @@ jobs:
 
     - name: Run Benchmark
       continue-on-error: true
+      env:
+        V1: ${{ inputs.v1 || 'org.slf4j:slf4j-api:1.7.35' }}
+        V2: ${{ inputs.v2 || 'org.slf4j:slf4j-api:1.7.36' }}
       run: |
-        ./gradlew :utilities:benchmark:runBenchmark --quiet > benchmark_report.md
+        ./gradlew :utilities:benchmark:runBenchmark -Dargus.bench.v1="$V1" -Dargus.bench.v2="$V2" --quiet > benchmark_report.md
         cat benchmark_report.md >> $GITHUB_STEP_SUMMARY
