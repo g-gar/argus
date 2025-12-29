@@ -4,4 +4,5 @@ include 'core'
 include 'bat:asm'
 include 'utilities:artifact_fetcher'
 include 'utilities:benchmark'
+include 'utilities:neural'
 project(':bat:asm').projectDir = file('bat/asm')
